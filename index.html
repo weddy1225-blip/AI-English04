@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的創意早餐店 - 經營成果</title>
+    <style>
+        :root { 
+            --p: #ff9f43; --s: #feca57; --bg: #fff9eb; --dark: #576574;
+            --white: #ffffff; --green: #1dd1a1; --red: #ff6b6b; --blue: #54a0ff;
+        }
+        body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background: var(--bg); color: var(--dark); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
+        #game-box { max-width: 500px; width: 90%; margin: 20px; background: var(--white); padding: 30px; border-radius: 30px; box-shadow: 0 15px 0 #f0d5a0, 0 20px 40px rgba(0,0,0,0.1); border: 6px solid var(--s); position: relative; }
+        h1 { text-align: center; color: var(--p); font-size: 2rem; margin-top: 0; }
+        
+        .status { display: flex; justify-content: space-between; margin-bottom: 15px; background: #ffeaa7; padding: 12px 20px; border-radius: 50px; color: #d35400; font-weight: bold; font-size: 0.9rem; }
+        #order-area { background: var(--dark); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); min-height: 140px; }
+        .order-text { font-size: 1.2rem; min-height: 30px; margin-top: 10px; font-weight: bold; }
+        #hint-text { color: #feca57; font-size: 0.95rem; margin-top: 10px; border-top: 1px solid #636e72; padding-top: 10px; min-height: 20px; font-weight: bold; }
+
+        .main-game { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .plate { background: #f1f2f6; border: 4px solid #dfe4ea; border-radius: 25px; padding: 15px; min-height: 100px; }
+        .shelf { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .food-btn { background: white; border: 2px solid #ecf0f1; padding: 10px; border-radius: 15px; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 0 #dfe4ea; display: flex; align-items: center; gap: 5px; font-size: 0.95rem; font-weight: bold; }
+        .food-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #dfe4ea; }
+
+        .plate-item { display: inline-flex; align-items: center; background: var(--white); padding: 5px 12px; border-radius: 50px; margin: 4px; border: 2px solid var(--s); font-size: 0.9rem; font-weight: bold; }
+        .del-btn { background: none; border: none; color: var(--red); font-weight: bold; margin-left: 8px; cursor: pointer; font-size: 1.1rem; }
+
+        .btn { padding: 15px; border: none; border-radius: 20px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
+        .btn-start { background: var(--p); color: white; width: 100%; box-shadow: 0 6px 0 #d35400; }
+        .btn-hint { background: #95a5a6; color: white; flex: 1; box-shadow: 0 4px 0 #7f8c8d; }
+        .btn-serve { background: var(--green); color: white; flex: 2; box-shadow: 0 4px 0 #10ac84; }
+        .btn-skip { background: #dfe4ea; color: #7f8c8d; font-size: 0.85rem; margin-top: 15px; width: 100%; border-radius: 15px; }
+        .flex-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .speaker-btn { background: var(--p); border: none; color: white; border-radius: 50%; width: 65px; height: 65px; cursor: pointer; font-size: 28px; box-shadow: 0 5px 0 #d35400; }
+
+        .result-table { text-align: left; background: #fffdf0; border-radius: 20px; padding: 20px; margin: 20px 0; border: 3px solid var(--s); }
+        .result-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ccc; }
+        .result-row:last-child { border-bottom: none; font-weight: bold; font-size: 1.3rem; color: var(--p); margin-top: 10px; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-box">
+    <div id="start-screen">
+        <h1>🍳 我的創意早餐店</h1>
+        <div style="text-align:center; line-height:1.8; background:#fff9eb; padding:25px; border-radius:25px; border:3px dashed var(--s); margin:20px 0; font-size: 1.1rem;">
+            你是創意早餐店的店長。<br>
+            當客人點餐後，你要給予正確數量的食物。<br>
+            <strong>點擊「開始遊戲」挑戰看看吧！</strong>
+        </div>
+        <button class="btn btn-start" onclick="startGame()">開始遊戲 Start!</button>
+    </div>
+
+    <div id="play-screen" class="hidden">
+        <div class="status">
+            <span>進度: <span id="progress-text">1/6</span></span>
+            <span id="timer-display">時間: 00:00</span>
+        </div>
+
+        <div id="order-area">
+            <button class="speaker-btn" onclick="speakOrder()">🔊</button>
+            <div id="display-text" class="order-text"></div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="main-game">
+            <div class="plate">
+                <div style="font-size:0.85rem; font-weight:bold; color:var(--p); margin-bottom:5px;">🛒 出餐盤 (Your Plate):</div>
+                <div id="plate-items"></div>
+            </div>
+            <div class="shelf" id="shelf"></div>
+        </div>
+
+        <div class="flex-btns">
+            <button class="btn btn-hint" onclick="showHint()">💡 提示</button>
+            <button class="btn btn-serve" onclick="checkAnswer()">🔔 上菜!</button>
+        </div>
+        <button class="btn btn-skip" onclick="skipQuestion()">⏩ 跳過此題 Skip</button>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 style="text-align:center; color:var(--p); font-size:2rem; margin:0;">🎊 經營成果報告</h2>
+        <div class="result-table" id="stat-list"></div>
+        <button class="btn btn-start" onclick="location.reload()">再玩一次</button>
+    </div>
+</div>
+
+<script>
+    // --- 隨機題庫系統 ---
+    const allQuestions = {
+        lv1: [
+            { txt: "I want four eggs, please.", ans: ["Egg","Egg","Egg","Egg"], h1: "4 eggs", h2: "【翻譯】我要四顆蛋。" },
+            { txt: "Can I have two breads and two juices?", ans: ["Bread","Bread","Juice","Juice"], h1: "2 breads, 2 juices", h2: "【翻譯】我要兩份麵包和兩杯果汁。" },
+            { txt: "Five apples, please.", ans: ["Apple","Apple","Apple","Apple","Apple"], h1: "5 apples", h2: "【翻譯】請給我五顆蘋果。" },
+            { txt: "I need one milk and three eggs.", ans: ["Milk","Egg","Egg","Egg"], h1: "1 milk, 3 eggs", h2: "【翻譯】我需要一杯牛奶和三顆蛋。" },
+            { txt: "Six breads for my family.", ans: ["Bread","Bread","Bread","Bread","Bread","Bread"], h1: "6 breads", h2: "【翻譯】幫我準備六份麵包。" },
+            { txt: "One juice and one apple, please.", ans: ["Juice","Apple"], h1: "1 juice, 1 apple", h2: "【翻譯】一杯果汁和一顆蘋果。" },
+            { txt: "Two milks and three breads.", ans: ["Milk","Milk","Bread","Bread","Bread"], h1: "2 milks, 3 breads", h2: "【翻譯】兩杯牛奶和三份麵包。" },
+            { txt: "I want seven eggs.", ans: ["Egg","Egg","Egg","Egg","Egg","Egg","Egg"], h1: "7 eggs", h2: "【翻譯】我要七顆蛋。" },
+            { txt: "One sandwich and one juice, please.", ans: ["Sandwich","Juice"], h1: "1 sandwich, 1 juice", h2: "【翻譯】一個三明治和一杯果汁。" },
+            { txt: "Three apples and two milks.", ans: ["Apple","Apple","Apple","Milk","Milk"], h1: "3 apples, 2 milks", h2: "【翻譯】三顆蘋果和兩杯牛奶。" }
+        ],
+        lv2: [
+            { txt: "I want one hot milk and one big sandwich.", ans: ["Hot Milk","Big Sandwich"], h1: "Hot milk, Big sandwich", h2: "【翻譯】我要一杯熱牛奶和一個大三明治。" },
+            { txt: "Two cold juices and one small apple.", ans: ["Cold Juice","Cold Juice","Small Apple"], h1: "2 cold juices, 1 small apple", h2: "【翻譯】兩杯冰果汁和一顆小蘋果。" },
+            { txt: "Three hot milks, please.", ans: ["Hot Milk","Hot Milk","Hot Milk"], h1: "3 hot milks", h2: "【翻譯】請給我三杯熱牛奶。" },
+            { txt: "One small sandwich and four big apples.", ans: ["Sandwich","Big Apple","Big Apple","Big Apple","Big Apple"], h1: "1 small sandwich, 4 big apples", h2: "【翻譯】一個小三明治和四顆大蘋果。" },
+            { txt: "Two cold juices and two breads.", ans: ["Cold Juice","Cold Juice","Bread","Bread"], h1: "2 cold juices, 2 breads", h2: "【翻譯】兩杯冰果汁和兩份麵包。" },
+            { txt: "One hot milk and one cold juice.", ans: ["Hot Milk","Cold Juice"], h1: "Hot milk, Cold juice", h2: "【翻譯】一杯熱牛奶和一杯冰果汁。" },
+            { txt: "Three big sandwiches, please.", ans: ["Big Sandwich","Big Sandwich","Big Sandwich"], h1: "3 big sandwiches", h2: "【翻譯】我要三個大三明治。" },
+            { txt: "Can I have five small apples?", ans: ["Small Apple","Small Apple","Small Apple","Small Apple","Small Apple"], h1: "5 small apples", h2: "【翻譯】我可以要五顆小蘋果嗎？" },
+            { txt: "One hot milk and two breads.", ans: ["Hot Milk","Bread","Bread"], h1: "1 hot milk, 2 breads", h2: "【翻譯】一杯熱牛奶和兩份麵包。" },
+            { txt: "Two big sandwiches and one cold juice.", ans: ["Big Sandwich","Big Sandwich","Cold Juice"], h1: "2 big sandwiches, 1 cold juice", h2: "【翻譯】兩個大三明治和一杯冰果汁。" }
+        ],
+        lv3: [
+            { txt: "A sandwich with an egg, please.", ans: ["Sandwich","Egg"], h1: "Sandwich + Egg", h2: "【翻譯】我要一個加蛋的三明治。" },
+            { txt: "I want bread and milk, but no apples.", ans: ["Bread","Milk"], h1: "Bread and milk (NO apples)", h2: "【翻譯】我要麵包和牛奶，但不要蘋果。" },
+            { txt: "One juice and two eggs, but no bread.", ans: ["Juice","Egg","Egg"], h1: "Juice, 2 eggs (NO bread)", h2: "【翻譯】一杯果汁和兩顆蛋，但不要麵包。" },
+            { txt: "A sandwich with two eggs.", ans: ["Sandwich","Egg","Egg"], h1: "Sandwich + 2 eggs", h2: "【翻譯】一個加了兩顆蛋的三明治。" },
+            { txt: "Milk and an apple, but no juice.", ans: ["Milk","Apple"], h1: "Milk, apple (NO juice)", h2: "【翻譯】牛奶和蘋果，但不要果汁。" },
+            { txt: "Two breads with one egg.", ans: ["Bread","Bread","Egg"], h1: "2 breads + 1 egg", h2: "【翻譯】兩份麵包加一顆蛋。" },
+            { txt: "I want juice and bread, but no milk.", ans: ["Juice","Bread"], h1: "Juice, bread (NO milk)", h2: "【翻譯】我要果汁和麵包，但不要牛奶。" },
+            { txt: "A big sandwich with an egg.", ans: ["Big Sandwich","Egg"], h1: "Big sandwich + 1 egg", h2: "【翻譯】一個大三明治加一顆蛋。" },
+            { txt: "Three apples and milk, but no bread.", ans: ["Apple","Apple","Apple","Milk"], h1: "3 apples, milk (NO bread)", h2: "【翻譯】三顆蘋果和牛奶，但不要麵包。" },
+            { txt: "One hot milk and one bread, but no eggs.", ans: ["Hot Milk","Bread"], h1: "Hot milk, bread (NO eggs)", h2: "【翻譯】一杯熱牛奶和一份麵包，但不要蛋。" }
+        ]
+    };
+
+    const foodList = [
+        {n:"Egg", e:"🍳"}, {n:"Bread", e:"🍞"}, {n:"Juice", e:"🧃"},
+        {n:"Hot Milk", e:"♨️🥛"}, {n:"Cold Juice", e:"❄️🧃"},
+        {n:"Big Sandwich", e:"🥪📏"}, {n:"Small Apple", e:"🍎🤏"},
+        {n:"Sandwich", e:"🥪"}, {n:"Milk", e:"🥛"}, {n:"Apple", e:"🍎"},
+        {n:"Big Apple", e:"🍎📏"}
+    ];
+
+    let gamePool = [], currentIdx = 0, plate = [], hStage = 0;
+    let stats = { correct: 0, wrong: 0, hints: 0, skips: 0, startTime: 0, totalSeconds: 0 };
+    let timerInterval;
+
+    function startGame() {
+        const shuffle = (arr) => arr.sort(() => 0.5 - Math.random());
+        gamePool = [
+            ...shuffle(allQuestions.lv1).slice(0, 2),
+            ...shuffle(allQuestions.lv2).slice(0, 2),
+            ...shuffle(allQuestions.lv3).slice(0, 2)
+        ];
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('play-screen').classList.remove('hidden');
+        stats.startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+        renderShelf();
+        loadQuest();
+    }
+
+    function updateTimer() {
+        stats.totalSeconds = Math.floor((Date.now() - stats.startTime) / 1000);
+        let m = Math.floor(stats.totalSeconds / 60).toString().padStart(2, '0');
+        let s = (stats.totalSeconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer-display').innerText = `時間: ${m}:${s}`;
+    }
+
+    function renderShelf() {
+        const s = document.getElementById('shelf');
+        s.innerHTML = foodList.map(f => `<button class="food-btn" onclick="add('${f.n}','${f.e}')"><span>${f.e}</span> ${f.n}</button>`).join('');
+    }
+
+    function loadQuest() {
+        document.getElementById('display-text').innerText = ""; 
+        document.getElementById('hint-text').innerText = "";
+        document.getElementById('progress-text').innerText = `${currentIdx + 1}/6`;
+        plate = []; hStage = 0;
+        updatePlate();
+        speakOrder();
+    }
+
+    function speakOrder() {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(gamePool[currentIdx].txt);
+        msg.lang = 'en-US'; msg.rate = 0.8;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function add(n, e) {
+        plate.push({n, e});
+        updatePlate();
+    }
+
+    function remove(i) {
+        plate.splice(i, 1);
+        updatePlate();
+    }
+
+    function updatePlate() {
+        const p = document.getElementById('plate-items');
+        p.innerHTML = plate.map((f, i) => `<div class="plate-item">${f.e} ${f.n}<button class="del-btn" onclick="remove(${i})">✕</button></div>`).join('');
+    }
+
+    function showHint() {
+        const q = gamePool[currentIdx];
+        if(hStage === 0) { 
+            document.getElementById('display-text').innerText = q.txt; 
+            document.getElementById('hint-text').innerText = "💡 關鍵字: " + q.h1; 
+            hStage = 1; stats.hints++; 
+        } else { 
+            document.getElementById('hint-text').innerText = q.h2; 
+        }
+    }
+
+    function checkAnswer() {
+        const q = gamePool[currentIdx];
+        const u = plate.map(x => x.n).sort();
+        const a = [...q.ans].sort();
+        if(JSON.stringify(u) === JSON.stringify(a)) {
+            alert("✨ 答對了！");
+            stats.correct++;
+            goNext();
+        } else {
+            alert("數量或食物不對喔！");
+            stats.wrong++;
+        }
+    }
+
+    function skipQuestion() {
+        if(confirm("確定要跳過嗎？")) { stats.skips++; goNext(); }
+    }
+
+    function goNext() {
+        currentIdx++;
+        if(currentIdx >= gamePool.length) finish(); else loadQuest();
+    }
+
+    function finish() {
+        clearInterval(timerInterval);
+        document.getElementById('play-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        
+        let score = (stats.correct * 100) - (stats.wrong * 20) - (stats.hints * 10) - (stats.skips * 50);
+        score = Math.max(0, score);
+        
+        let rank = "🥉 銅牌店長";
+        if(score >= 550 && stats.hints === 0) rank = "🥇 金牌店長";
+        else if(score >= 400) rank = "🥈 銀牌店長";
+
+        let m = Math.floor(stats.totalSeconds / 60);
+        let s = stats.totalSeconds % 60;
+
+        document.getElementById('stat-list').innerHTML = `
+            <div class="result-row"><span>⏱️ 用時：</span><span>${m}分${s}秒</span></div>
+            <div class="result-row"><span>✅ 答對題數：</span><span>${stats.correct} / 6</span></div>
+            <div class="result-row"><span>❌ 答錯次數：</span><span>${stats.wrong}</span></div>
+            <div class="result-row"><span>💡 使用提示：</span><span>${stats.hints}</span></div>
+            <div class="result-row"><span>⏩ 跳過次數：</span><span>${stats.skips}</span></div>
+            <div class="result-row"><span>⭐ 經營總分：</span><span>${score}</span></div>
+            <div class="result-row" style="border:none; margin-top:15px; justify-content:center; font-size:1.8rem;">${rank}</div>
+        `;
+    }
+</script>
+</body>
+</html>
