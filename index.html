@@ -3,41 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的創意早餐店 - 經營成果</title>
+    <title>我的創意早餐店 - 寬螢幕優化版</title>
     <style>
         :root { 
             --p: #ff9f43; --s: #feca57; --bg: #fff9eb; --dark: #576574;
             --white: #ffffff; --green: #1dd1a1; --red: #ff6b6b; --blue: #54a0ff;
         }
-        body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background: var(--bg); color: var(--dark); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
-        #game-box { max-width: 500px; width: 90%; margin: 20px; background: var(--white); padding: 30px; border-radius: 30px; box-shadow: 0 15px 0 #f0d5a0, 0 20px 40px rgba(0,0,0,0.1); border: 6px solid var(--s); position: relative; }
-        h1 { text-align: center; color: var(--p); font-size: 2rem; margin-top: 0; }
+        body { 
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; 
+            background: var(--bg); color: var(--dark); margin: 0; 
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; /* 禁止全域捲動 */
+        }
+        #game-box { 
+            max-width: 850px; width: 95%; background: var(--white); 
+            padding: 20px; border-radius: 30px; 
+            box-shadow: 0 10px 0 #f0d5a0, 0 15px 30px rgba(0,0,0,0.1); 
+            border: 6px solid var(--s);
+        }
+        h1 { text-align: center; color: var(--p); font-size: 1.8rem; margin: 0 0 15px 0; }
         
-        .status { display: flex; justify-content: space-between; margin-bottom: 15px; background: #ffeaa7; padding: 12px 20px; border-radius: 50px; color: #d35400; font-weight: bold; font-size: 0.9rem; }
-        #order-area { background: var(--dark); color: white; padding: 25px; border-radius: 25px; text-align: center; margin-bottom: 20px; box-shadow: inset 0 4px 10px rgba(0,0,0,0.3); min-height: 140px; }
-        .order-text { font-size: 1.2rem; min-height: 30px; margin-top: 10px; font-weight: bold; }
-        #hint-text { color: #feca57; font-size: 0.95rem; margin-top: 10px; border-top: 1px solid #636e72; padding-top: 10px; min-height: 20px; font-weight: bold; }
+        .status { display: flex; justify-content: space-between; margin-bottom: 10px; background: #ffeaa7; padding: 8px 20px; border-radius: 50px; color: #d35400; font-weight: bold; }
+        
+        #order-area { 
+            background: var(--dark); color: white; padding: 15px; 
+            border-radius: 20px; text-align: center; margin-bottom: 15px; 
+            display: flex; align-items: center; justify-content: center; gap: 20px;
+        }
+        .order-info { flex: 1; text-align: left; }
+        .order-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+        #hint-text { color: #feca57; font-size: 0.9rem; border-top: 1px solid #636e72; padding-top: 5px; min-height: 1.2rem; }
 
-        .main-game { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .plate { background: #f1f2f6; border: 4px solid #dfe4ea; border-radius: 25px; padding: 15px; min-height: 100px; }
-        .shelf { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .food-btn { background: white; border: 2px solid #ecf0f1; padding: 10px; border-radius: 15px; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 0 #dfe4ea; display: flex; align-items: center; gap: 5px; font-size: 0.95rem; font-weight: bold; }
-        .food-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #dfe4ea; }
+        /* 遊戲核心區：改為並排 */
+        .game-main-row { display: flex; gap: 15px; margin-bottom: 15px; height: 280px; }
+        
+        .plate { 
+            flex: 1; background: #f1f2f6; border: 4px solid #dfe4ea; 
+            border-radius: 20px; padding: 10px; overflow-y: auto; 
+        }
+        .shelf { 
+            flex: 1.5; display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; overflow-y: auto; padding-right: 5px;
+        }
 
-        .plate-item { display: inline-flex; align-items: center; background: var(--white); padding: 5px 12px; border-radius: 50px; margin: 4px; border: 2px solid var(--s); font-size: 0.9rem; font-weight: bold; }
-        .del-btn { background: none; border: none; color: var(--red); font-weight: bold; margin-left: 8px; cursor: pointer; font-size: 1.1rem; }
+        .food-btn { 
+            background: white; border: 2px solid #ecf0f1; padding: 8px; 
+            border-radius: 12px; cursor: pointer; transition: 0.1s; 
+            box-shadow: 0 3px 0 #dfe4ea; display: flex; align-items: center; 
+            gap: 5px; font-size: 0.85rem; font-weight: bold;
+        }
+        .food-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #dfe4ea; }
 
-        .btn { padding: 15px; border: none; border-radius: 20px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
-        .btn-start { background: var(--p); color: white; width: 100%; box-shadow: 0 6px 0 #d35400; }
-        .btn-hint { background: #95a5a6; color: white; flex: 1; box-shadow: 0 4px 0 #7f8c8d; }
-        .btn-serve { background: var(--green); color: white; flex: 2; box-shadow: 0 4px 0 #10ac84; }
-        .btn-skip { background: #dfe4ea; color: #7f8c8d; font-size: 0.85rem; margin-top: 15px; width: 100%; border-radius: 15px; }
-        .flex-btns { display: flex; gap: 10px; margin-top: 10px; }
-        .speaker-btn { background: var(--p); border: none; color: white; border-radius: 50%; width: 65px; height: 65px; cursor: pointer; font-size: 28px; box-shadow: 0 5px 0 #d35400; }
+        .plate-item { 
+            display: inline-flex; align-items: center; background: var(--white); 
+            padding: 4px 10px; border-radius: 50px; margin: 3px; 
+            border: 2px solid var(--s); font-size: 0.85rem; font-weight: bold;
+        }
+        .del-btn { background: none; border: none; color: var(--red); font-weight: bold; margin-left: 5px; cursor: pointer; }
 
-        .result-table { text-align: left; background: #fffdf0; border-radius: 20px; padding: 20px; margin: 20px 0; border: 3px solid var(--s); }
-        .result-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ccc; }
-        .result-row:last-child { border-bottom: none; font-weight: bold; font-size: 1.3rem; color: var(--p); margin-top: 10px; }
+        .btn { padding: 12px; border: none; border-radius: 15px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+        .btn-start { background: var(--p); color: white; width: 100%; box-shadow: 0 5px 0 #d35400; }
+        .btn-hint { background: #95a5a6; color: white; flex: 1; }
+        .btn-serve { background: var(--green); color: white; flex: 2; }
+        .btn-skip { background: #dfe4ea; color: #7f8c8d; font-size: 0.8rem; margin-top: 10px; width: 100%; border-radius: 12px; }
+        
+        .flex-btns { display: flex; gap: 10px; }
+        .speaker-btn { background: var(--p); border: none; color: white; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 22px; box-shadow: 0 4px 0 #d35400; flex-shrink: 0; }
+
+        .result-table { text-align: left; background: #fffdf0; border-radius: 20px; padding: 15px; margin: 15px 0; border: 3px solid var(--s); font-size: 0.95rem; }
+        .result-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #ccc; }
+        .result-row:last-child { border-bottom: none; font-weight: bold; font-size: 1.5rem; color: var(--p); margin-top: 5px; text-align: center; justify-content: center; }
         
         .hidden { display: none; }
     </style>
@@ -47,10 +82,9 @@
 <div id="game-box">
     <div id="start-screen">
         <h1>🍳 我的創意早餐店</h1>
-        <div style="text-align:center; line-height:1.8; background:#fff9eb; padding:25px; border-radius:25px; border:3px dashed var(--s); margin:20px 0; font-size: 1.1rem;">
-            你是創意早餐店的店長。<br>
-            當客人點餐後，你要給予正確數量的食物。<br>
-            <strong>點擊「開始遊戲」挑戰看看吧！</strong>
+        <div style="text-align:center; line-height:1.6; background:#fff9eb; padding:20px; border-radius:20px; border:3px dashed var(--s); margin-bottom:20px;">
+            你是創意早餐店的店長。當客人點餐後，你要給予正確數量的食物。<br>
+            <strong>準備好挑戰金牌店長了嗎？</strong>
         </div>
         <button class="btn btn-start" onclick="startGame()">開始遊戲 Start!</button>
     </div>
@@ -63,34 +97,36 @@
 
         <div id="order-area">
             <button class="speaker-btn" onclick="speakOrder()">🔊</button>
-            <div id="display-text" class="order-text"></div>
-            <div id="hint-text"></div>
+            <div class="order-info">
+                <div id="display-text" class="order-text">點擊喇叭聽訂單</div>
+                <div id="hint-text"></div>
+            </div>
         </div>
 
-        <div class="main-game">
+        <div class="game-main-row">
             <div class="plate">
-                <div style="font-size:0.85rem; font-weight:bold; color:var(--p); margin-bottom:5px;">🛒 出餐盤 (Your Plate):</div>
+                <div style="font-size:0.8rem; font-weight:bold; color:var(--p); margin-bottom:5px;">🛒 出餐盤 (Your Plate):</div>
                 <div id="plate-items"></div>
             </div>
             <div class="shelf" id="shelf"></div>
         </div>
 
         <div class="flex-btns">
-            <button class="btn btn-hint" onclick="showHint()">💡 提示</button>
-            <button class="btn btn-serve" onclick="checkAnswer()">🔔 上菜!</button>
+            <button class="btn btn-hint" onclick="showHint()">💡 提示 Hint</button>
+            <button class="btn btn-serve" onclick="checkAnswer()">🔔 上菜 Serve</button>
         </div>
-        <button class="btn btn-skip" onclick="skipQuestion()">⏩ 跳過此題 Skip</button>
+        <button class="btn btn-skip" onclick="skipQuestion()">⏩ 跳過 Skip</button>
     </div>
 
     <div id="result-screen" class="hidden">
-        <h2 style="text-align:center; color:var(--p); font-size:2rem; margin:0;">🎊 經營成果報告</h2>
+        <h2 style="text-align:center; color:var(--p); margin:0;">🎊 經營成果報告</h2>
         <div class="result-table" id="stat-list"></div>
         <button class="btn btn-start" onclick="location.reload()">再玩一次</button>
     </div>
 </div>
 
 <script>
-    // --- 隨機題庫系統 ---
+    // 題庫與邏輯保持不變...
     const allQuestions = {
         lv1: [
             { txt: "I want four eggs, please.", ans: ["Egg","Egg","Egg","Egg"], h1: "4 eggs", h2: "【翻譯】我要四顆蛋。" },
@@ -144,11 +180,7 @@
 
     function startGame() {
         const shuffle = (arr) => arr.sort(() => 0.5 - Math.random());
-        gamePool = [
-            ...shuffle(allQuestions.lv1).slice(0, 2),
-            ...shuffle(allQuestions.lv2).slice(0, 2),
-            ...shuffle(allQuestions.lv3).slice(0, 2)
-        ];
+        gamePool = [...shuffle(allQuestions.lv1).slice(0, 2), ...shuffle(allQuestions.lv2).slice(0, 2), ...shuffle(allQuestions.lv3).slice(0, 2)];
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('play-screen').classList.remove('hidden');
         stats.startTime = Date.now();
@@ -170,12 +202,10 @@
     }
 
     function loadQuest() {
-        document.getElementById('display-text').innerText = ""; 
+        document.getElementById('display-text').innerText = "點擊喇叭聽訂單"; 
         document.getElementById('hint-text').innerText = "";
         document.getElementById('progress-text').innerText = `${currentIdx + 1}/6`;
-        plate = []; hStage = 0;
-        updatePlate();
-        speakOrder();
+        plate = []; hStage = 0; updatePlate(); speakOrder();
     }
 
     function speakOrder() {
@@ -185,16 +215,8 @@
         window.speechSynthesis.speak(msg);
     }
 
-    function add(n, e) {
-        plate.push({n, e});
-        updatePlate();
-    }
-
-    function remove(i) {
-        plate.splice(i, 1);
-        updatePlate();
-    }
-
+    function add(n, e) { plate.push({n, e}); updatePlate(); }
+    function remove(i) { plate.splice(i, 1); updatePlate(); }
     function updatePlate() {
         const p = document.getElementById('plate-items');
         p.innerHTML = plate.map((f, i) => `<div class="plate-item">${f.e} ${f.n}<button class="del-btn" onclick="remove(${i})">✕</button></div>`).join('');
@@ -204,59 +226,35 @@
         const q = gamePool[currentIdx];
         if(hStage === 0) { 
             document.getElementById('display-text').innerText = q.txt; 
-            document.getElementById('hint-text').innerText = "💡 關鍵字: " + q.h1; 
-            hStage = 1; stats.hints++; 
-        } else { 
-            document.getElementById('hint-text').innerText = q.h2; 
-        }
+            document.getElementById('hint-text').innerText = "💡 提示: " + q.h1; hStage = 1; stats.hints++; 
+        } else { document.getElementById('hint-text').innerText = q.h2; }
     }
 
     function checkAnswer() {
         const q = gamePool[currentIdx];
         const u = plate.map(x => x.n).sort();
         const a = [...q.ans].sort();
-        if(JSON.stringify(u) === JSON.stringify(a)) {
-            alert("✨ 答對了！");
-            stats.correct++;
-            goNext();
-        } else {
-            alert("數量或食物不對喔！");
-            stats.wrong++;
-        }
+        if(JSON.stringify(u) === JSON.stringify(a)) { stats.correct++; goNext(); } else { alert("再檢查看看喔！"); stats.wrong++; }
     }
 
-    function skipQuestion() {
-        if(confirm("確定要跳過嗎？")) { stats.skips++; goNext(); }
-    }
-
-    function goNext() {
-        currentIdx++;
-        if(currentIdx >= gamePool.length) finish(); else loadQuest();
-    }
+    function skipQuestion() { if(confirm("跳過這題？")) { stats.skips++; goNext(); } }
+    function goNext() { currentIdx++; if(currentIdx >= gamePool.length) finish(); else loadQuest(); }
 
     function finish() {
         clearInterval(timerInterval);
         document.getElementById('play-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        
-        let score = (stats.correct * 100) - (stats.wrong * 20) - (stats.hints * 10) - (stats.skips * 50);
-        score = Math.max(0, score);
-        
+        let score = Math.max(0, (stats.correct * 100) - (stats.wrong * 20) - (stats.hints * 10) - (stats.skips * 50));
         let rank = "🥉 銅牌店長";
-        if(score >= 550 && stats.hints === 0) rank = "🥇 金牌店長";
-        else if(score >= 400) rank = "🥈 銀牌店長";
-
-        let m = Math.floor(stats.totalSeconds / 60);
-        let s = stats.totalSeconds % 60;
-
+        if(score >= 550 && stats.hints === 0) rank = "🥇 金牌店長"; else if(score >= 400) rank = "🥈 銀牌店長";
+        let m = Math.floor(stats.totalSeconds / 60), s = stats.totalSeconds % 60;
         document.getElementById('stat-list').innerHTML = `
             <div class="result-row"><span>⏱️ 用時：</span><span>${m}分${s}秒</span></div>
-            <div class="result-row"><span>✅ 答對題數：</span><span>${stats.correct} / 6</span></div>
-            <div class="result-row"><span>❌ 答錯次數：</span><span>${stats.wrong}</span></div>
-            <div class="result-row"><span>💡 使用提示：</span><span>${stats.hints}</span></div>
-            <div class="result-row"><span>⏩ 跳過次數：</span><span>${stats.skips}</span></div>
-            <div class="result-row"><span>⭐ 經營總分：</span><span>${score}</span></div>
-            <div class="result-row" style="border:none; margin-top:15px; justify-content:center; font-size:1.8rem;">${rank}</div>
+            <div class="result-row"><span>✅ 答對：</span><span>${stats.correct}/6</span></div>
+            <div class="result-row"><span>❌ 答錯：</span><span>${stats.wrong}</span></div>
+            <div class="result-row"><span>💡 提示：</span><span>${stats.hints}</span></div>
+            <div class="result-row"><span>⭐ 總分：</span><span>${score}</span></div>
+            <div class="result-row"><span>${rank}</span></div>
         `;
     }
 </script>
